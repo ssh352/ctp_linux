@@ -22,7 +22,7 @@ int main(void)
     char FRONT_ADDR[] = "tcp://180.168.146.187:10011"; // 前置地址
     // 初始化UserApi
     pUserApi = CThostFtdcMdApi::CreateFtdcMdApi("./ctp_linux_md/"); // 创建UserApi
-    CMdSpi* pUserSpi = new CMdSpi();
+    CThostFtdcMdSpi* pUserSpi = new CMdSpi();
     pUserApi->RegisterSpi(pUserSpi);     // 注册事件类
     pUserApi->RegisterFront(FRONT_ADDR); // connect
     pUserApi->Init();

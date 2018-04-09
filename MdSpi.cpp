@@ -1,6 +1,7 @@
 #include "MdSpi.h"
 #include <iostream>
 #include <string.h>
+#include <stdio.h>
 using namespace std;
 
 #pragma warning(disable : 4996)
@@ -63,13 +64,13 @@ void CMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin,
     // 参考ctp开发文档的行情demo
     if (pRspInfo->ErrorID != 0) {
 	printf("Failed to login,errorcode=%d, errormsg=%s,requestid=%d,chain=%d", pRspInfo->ErrorID, pRspInfo->ErrorMsg, nRequestID, bIsLast);
-	exit(-1);
+	return;
     }
     printf("ErrorCode=[%d], ErrorMsg=[%s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
     printf("RequestID=[%d], chain=[%d]\n", nRequestID, bIsLast);
 
-    printf("TradingDay=%s,LoginTime=%s,BrokerID=%s,UserId=%s,SystemName=%s,FrontID=%d,SessionID=%d", pRspUserLogin->TradingDay, pRspUserLogin->LoginTime, pRspUserLogin->BrokerID, pRspUserLogin->UserID, pRspUserLogin->SystemName, pRspUserLogin->FrontID, pRspUserLogin->SessionID);
-    printf("MaxOrderRef=%s,SHFETime=%s,DCETime=%s,CZCETime=%s,FFEXTime=%s,INETime=%s", pRspUserLogin->MaxOrderRef, pRspUserLogin->SHFETime, pRspUserLogin->DCETime, pRspUserLogin->CZCETime, pRspUserLogin->FFEXTime, pRspUserLogin->INETime);
+    printf("TradingDay=%s,LoginTime=%s,BrokerID=%s,UserId=%s,SystemName=%s,FrontID=%d,SessionID=%d\n", pRspUserLogin->TradingDay, pRspUserLogin->LoginTime, pRspUserLogin->BrokerID, pRspUserLogin->UserID, pRspUserLogin->SystemName, pRspUserLogin->FrontID, pRspUserLogin->SessionID);
+    printf("MaxOrderRef=%s,SHFETime=%s,DCETime=%s,CZCETime=%s,FFEXTime=%s,INETime=%s\n", pRspUserLogin->MaxOrderRef, pRspUserLogin->SHFETime, pRspUserLogin->DCETime, pRspUserLogin->CZCETime, pRspUserLogin->FFEXTime, pRspUserLogin->INETime);
 
     // char * Instrument[] = {"ru1810","rb1810"};
     // pUserApi->SubscribeMarketData(Instrument,2);
