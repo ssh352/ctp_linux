@@ -1,6 +1,6 @@
 #include "MdSpi.h"
-#include <string.h>
 #include <iostream>
+#include <string.h>
 using namespace std;
 
 #pragma warning(disable : 4996)
@@ -53,19 +53,32 @@ void CMdSpi::ReqUserLogin()
     strcpy(req.UserID, "067938");
     strcpy(req.Password, "6432281");
     int iResult = pUserApi->ReqUserLogin(&req, ++iRequestID);
-    cerr << "--->>> 发送用户登录请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
+    cerr << "--->>> sent login request: " << ((iResult == 0) ? "success" : "failed") << endl;
 }
 
 void CMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin,
     CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
     cerr << "--->>> " << __FUNCTION__ << endl;
-    if (bIsLast && !IsErrorRspInfo(pRspInfo)) {
-	///获取当前交易日
-	cerr << "--->>> 获取当前交易日 = " << pUserApi->GetTradingDay() << endl;
-	// 请求订阅行情
-	// SubscribeMarketData();
+    // 参考ctp开发文档的行情demo
+    if (pRspInfo->ErrorID != 0) {
+	printf("Failed to login,errorcode=%d, errormsg=%s,requestid=%d,chain=%d", pRspInfo->ErrorID, pRspInfo->ErrorMsg, nRequestID, bIsLast);
+	exit(-1);
     }
+    printf("ErrorCode=[%d], ErrorMsg=[%s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+    printf("RequestID=[%d], chain=[%d]\n", nRequestID, bIsLast);
+
+    printf("TradingDay=%s,LoginTime=%s,BrokerID=%s,UserId=%s,SystemName=%s,FrontID=%d,SessionID=%d", pRspUserLogin->TradingDay, pRspUserLogin->LoginTime, pRspUserLogin->BrokerID, pRspUserLogin->UserID, pRspUserLogin->SystemName, pRspUserLogin->FrontID, pRspUserLogin->SessionID);
+    printf("MaxOrderRef=%s,SHFETime=%s,DCETime=%s,CZCETime=%s,FFEXTime=%s,INETime=%s", pRspUserLogin->MaxOrderRef, pRspUserLogin->SHFETime, pRspUserLogin->DCETime, pRspUserLogin->CZCETime, pRspUserLogin->FFEXTime, pRspUserLogin->INETime);
+
+    // char * Instrument[] = {"ru1810","rb1810"};
+    // pUserApi->SubscribeMarketData(Instrument,2);
+    // if (bIsLast && !IsErrorRspInfo(pRspInfo)) {
+    //     ///获取当前交易日
+    //     cerr << "--->>> call api function GetTradingDay = " << pUserApi->GetTradingDay() << endl;
+    //     // 请求订阅行情
+    //     // SubscribeMarketData();
+    // }
 }
 
 void CMdSpi::SubscribeMarketData()
