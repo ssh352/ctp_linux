@@ -57,7 +57,7 @@ void CMdSpi::ReqUserLogin()
 {
     CThostFtdcReqUserLoginField req;
     memset(&req, 0, sizeof(req));
-    strcpy(req.BrokerID, "9999");
+    strcpy(req.BrokerID, "8070");
     strcpy(req.UserID, "067938");
     strcpy(req.Password, "6432281");
     int iResult = pUserApi->ReqUserLogin(&req, ++iRequestID);

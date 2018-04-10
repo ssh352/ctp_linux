@@ -19,7 +19,8 @@ int iRequestID = 0;
 
 int main(void)
 {
-    char FRONT_ADDR[] = "tcp://180.168.146.187:10011"; // 前置地址
+    //char FRONT_ADDR[] = "tcp://180.168.146.187:10011"; // 前置地址
+    char FRONT_ADDR[] = "tcp://180.168.214.246:41213"; // 前置地址
     // 初始化UserApi
     pUserApi = CThostFtdcMdApi::CreateFtdcMdApi("./ctp_linux_md/"); // 创建UserApi
     CThostFtdcMdSpi* pUserSpi = new CMdSpi();
