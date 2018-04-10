@@ -80,26 +80,23 @@ void CMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin,
     printf("TradingDay=%s,LoginTime=%s,BrokerID=%s,UserId=%s,SystemName=%s,FrontID=%d,SessionID=%d\n", pRspUserLogin->TradingDay, pRspUserLogin->LoginTime, pRspUserLogin->BrokerID, pRspUserLogin->UserID, pRspUserLogin->SystemName, pRspUserLogin->FrontID, pRspUserLogin->SessionID);
     printf("MaxOrderRef=%s,SHFETime=%s,DCETime=%s,CZCETime=%s,FFEXTime=%s,INETime=%s\n", pRspUserLogin->MaxOrderRef, pRspUserLogin->SHFETime, pRspUserLogin->DCETime, pRspUserLogin->CZCETime, pRspUserLogin->FFEXTime, pRspUserLogin->INETime);
 
-    // char * Instrument[] = {"ru1810","rb1810"};
-    // pUserApi->SubscribeMarketData(Instrument,2);
-    // if (bIsLast && !IsErrorRspInfo(pRspInfo)) {
-    //     ///获取当前交易日
-    //     cerr << "--->>> call api function GetTradingDay = " << pUserApi->GetTradingDay() << endl;
-    //     // 请求订阅行情
-    //     // SubscribeMarketData();
-    // }
+     if (bIsLast && !IsErrorRspInfo(pRspInfo)) {
+        cerr << "--->>> call api function GetTradingDay = " << pUserApi->GetTradingDay() << endl;
+     }
+	SubscribeMarketData();
 }
 
 void CMdSpi::SubscribeMarketData()
 {
-    cerr << __FUNCTION__ << endl;
-    int iResult = pUserApi->SubscribeMarketData({"IF1804","RU1810"}, 2);
+    cerr << "--->>> " << __FUNCTION__ << endl;
+    char *pp[] = {"IF1804","IF1805"};
+    int iResult = pUserApi->SubscribeMarketData(pp, 2);
     cerr << "--->>> send SubscribeMarketData request: " << ((iResult == 0) ? "success" : "failed") << endl;
 }
 
 void CMdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificInstrument, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
-    cerr << __FUNCTION__ << endl;
+    cerr << "--->>> " << __FUNCTION__ << endl;
     PrintOut(pRspInfo,nRequestID,bIsLast);
     printf("InstrumentID=%s\n",pSpecificInstrument->InstrumentID);
 
@@ -107,7 +104,7 @@ void CMdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificInst
 
 void CMdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificInstrument, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
-    cerr << __FUNCTION__ << endl;
+    cerr << "--->>> " << __FUNCTION__ << endl;
     PrintOut(pRspInfo,nRequestID,bIsLast);
     printf("InstrumentID=%s\n",pSpecificInstrument->InstrumentID);
 
@@ -115,51 +112,51 @@ void CMdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificIn
 
 void CMdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField* pDepthMarketData)
 {
-    cerr << __FUNCTION__ << endl;
-	cerr << "TradingDay" <<pDepthMarketData->TradingDay;
-	cerr << "InstrumentID" <<pDepthMarketData->InstrumentID;
-	cerr << "ExchangeID" <<pDepthMarketData->ExchangeID;
-	cerr << "ExchangeInstID" <<pDepthMarketData->ExchangeInstID;
-	cerr << "LastPrice" <<pDepthMarketData->LastPrice;
-	cerr << "PreSettlementPrice" <<pDepthMarketData->PreSettlementPrice;
-	cerr << "PreClosePrice" <<pDepthMarketData->PreClosePrice;
-	cerr << "PreOpenInterest" <<pDepthMarketData->PreOpenInterest;
-	cerr << "OpenPrice" <<pDepthMarketData->OpenPrice;
-	cerr << "HighestPrice" <<pDepthMarketData->HighestPrice;
-	cerr << "LowestPrice" <<pDepthMarketData->LowestPrice;
-	cerr << "Volume" <<pDepthMarketData->Volume;
-	cerr << "Turnover" <<pDepthMarketData->Turnover;
-	cerr << "OpenInterest" <<pDepthMarketData->OpenInterest;
-	cerr << "ClosePrice" <<pDepthMarketData->ClosePrice;
-	cerr << "SettlementPrice" <<pDepthMarketData->SettlementPrice;
-	cerr << "UpperLimitPrice" <<pDepthMarketData->UpperLimitPrice;
-	cerr << "LowerLimitPrice" <<pDepthMarketData->LowerLimitPrice;
-	cerr << "PreDelta" <<pDepthMarketData->PreDelta;
-	cerr << "CurrDelta" <<pDepthMarketData->CurrDelta;
-	cerr << "UpdateTime" <<pDepthMarketData->UpdateTime;
-	cerr << "UpdateMillisec" <<pDepthMarketData->UpdateMillisec;
-	cerr << "BidPrice1" <<pDepthMarketData->BidPrice1;
-	cerr << "BidVolume1" <<pDepthMarketData->BidVolume1;
-	cerr << "AskPrice1" <<pDepthMarketData->AskPrice1;
-	cerr << "AskVolume1" <<pDepthMarketData->AskVolume1;
-	cerr << "BidPrice2" <<pDepthMarketData->BidPrice2;
-	cerr << "BidVolume2" <<pDepthMarketData->BidVolume2;
-	cerr << "AskPrice2" <<pDepthMarketData->AskPrice2;
-	cerr << "AskVolume2" <<pDepthMarketData->AskVolume2;
-	cerr << "BidPrice3" <<pDepthMarketData->BidPrice3;
-	cerr << "BidVolume3" <<pDepthMarketData->BidVolume3;
-	cerr << "AskPrice3" <<pDepthMarketData->AskPrice3;
-	cerr << "AskVolume3" <<pDepthMarketData->AskVolume3;
-	cerr << "BidPrice4" <<pDepthMarketData->BidPrice4;
-	cerr << "BidVolume4" <<pDepthMarketData->BidVolume4;
-	cerr << "AskPrice4" <<pDepthMarketData->AskPrice4;
-	cerr << "AskVolume4" <<pDepthMarketData->AskVolume4;
-	cerr << "BidPrice5" <<pDepthMarketData->BidPrice5;
-	cerr << "BidVolume5" <<pDepthMarketData->BidVolume5;
-	cerr << "AskPrice5" <<pDepthMarketData->AskPrice5;
-	cerr << "AskVolume5" <<pDepthMarketData->AskVolume5;
-	cerr << "AveragePrice" <<pDepthMarketData->AveragePrice;
-	cerr << "ActionDay" <<pDepthMarketData->ActionDay;
+    cerr << "--->>> " << __FUNCTION__ << endl;
+	cerr << "TradingDay=" <<pDepthMarketData->TradingDay << endl;
+	cerr << "InstrumentID=" <<pDepthMarketData->InstrumentID << endl;
+	cerr << "ExchangeID=" <<pDepthMarketData->ExchangeID << endl;
+	cerr << "ExchangeInstID=" <<pDepthMarketData->ExchangeInstID << endl;
+	cerr << "LastPrice=" <<pDepthMarketData->LastPrice << endl;
+	cerr << "PreSettlementPrice=" <<pDepthMarketData->PreSettlementPrice << endl;
+	cerr << "PreClosePrice=" <<pDepthMarketData->PreClosePrice << endl;
+	cerr << "PreOpenInterest=" <<pDepthMarketData->PreOpenInterest << endl;
+	cerr << "OpenPrice=" <<pDepthMarketData->OpenPrice << endl;
+	cerr << "HighestPrice=" <<pDepthMarketData->HighestPrice << endl;
+	cerr << "LowestPrice=" <<pDepthMarketData->LowestPrice << endl;
+	cerr << "Volume=" <<pDepthMarketData->Volume << endl;
+	cerr << "Turnover=" <<pDepthMarketData->Turnover << endl;
+	cerr << "OpenInterest=" <<pDepthMarketData->OpenInterest << endl;
+	cerr << "ClosePrice=" <<pDepthMarketData->ClosePrice << endl;
+	cerr << "SettlementPrice=" <<pDepthMarketData->SettlementPrice << endl;
+	cerr << "UpperLimitPrice=" <<pDepthMarketData->UpperLimitPrice << endl;
+	cerr << "LowerLimitPrice=" <<pDepthMarketData->LowerLimitPrice << endl;
+	cerr << "PreDelta=" <<pDepthMarketData->PreDelta << endl;
+	cerr << "CurrDelta=" <<pDepthMarketData->CurrDelta << endl;
+	cerr << "UpdateTime=" <<pDepthMarketData->UpdateTime << endl;
+	cerr << "UpdateMillisec=" <<pDepthMarketData->UpdateMillisec << endl;
+	cerr << "BidPrice1=" <<pDepthMarketData->BidPrice1 << endl;
+	cerr << "BidVolume1=" <<pDepthMarketData->BidVolume1 << endl;
+	cerr << "AskPrice1=" <<pDepthMarketData->AskPrice1 << endl;
+	cerr << "AskVolume1=" <<pDepthMarketData->AskVolume1 << endl;
+	cerr << "BidPrice2=" <<pDepthMarketData->BidPrice2 << endl;
+	cerr << "BidVolume2=" <<pDepthMarketData->BidVolume2 << endl;
+	cerr << "AskPrice2=" <<pDepthMarketData->AskPrice2 << endl;
+	cerr << "AskVolume2=" <<pDepthMarketData->AskVolume2 << endl;
+	cerr << "BidPrice3=" <<pDepthMarketData->BidPrice3 << endl;
+	cerr << "BidVolume3=" <<pDepthMarketData->BidVolume3 << endl;
+	cerr << "AskPrice3=" <<pDepthMarketData->AskPrice3 << endl;
+	cerr << "AskVolume3=" <<pDepthMarketData->AskVolume3 << endl;
+	cerr << "BidPrice4=" <<pDepthMarketData->BidPrice4 << endl;
+	cerr << "BidVolume4=" <<pDepthMarketData->BidVolume4 << endl;
+	cerr << "AskPrice4=" <<pDepthMarketData->AskPrice4 << endl;
+	cerr << "AskVolume4=" <<pDepthMarketData->AskVolume4 << endl;
+	cerr << "BidPrice5=" <<pDepthMarketData->BidPrice5 << endl;
+	cerr << "BidVolume5=" <<pDepthMarketData->BidVolume5 << endl;
+	cerr << "AskPrice5=" <<pDepthMarketData->AskPrice5 << endl;
+	cerr << "AskVolume5=" <<pDepthMarketData->AskVolume5 << endl;
+	cerr << "AveragePrice=" <<pDepthMarketData->AveragePrice << endl;
+	cerr << "ActionDay=" <<pDepthMarketData->ActionDay << endl;
 }
 
 bool CMdSpi::IsErrorRspInfo(CThostFtdcRspInfoField* pRspInfo)

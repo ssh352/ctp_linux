@@ -27,7 +27,7 @@ int main(void)
     pUserApi->RegisterFront(FRONT_ADDR); // connect
     pUserApi->Init();
 
-    pUserApi->Join();
+     pUserApi->Join();
     //	pUserApi->Release();
 }
 
