@@ -1,8 +1,10 @@
+// #include "ThostFtdcTraderApi.h"
+#include "TraderSpi.h"
+#include <stdio.h>
 #include <iostream>
+#include <string.h>
 using namespace std;
 
-#include "ThostFtdcTraderApi.h"
-#include "TraderSpi.h"
 
 #pragma warning(disable : 4996)
 
@@ -59,17 +61,20 @@ void CTraderSpi::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin, CTho
     if (pRspInfo->ErrorID != 0) {
 	return;
     }
-    cerr << "TradingDay=" << pRspUserLogin->TradingDay << endl;
-    cerr << "TBrokerID=" << pRspUserLogin->BrokerID << endl;
-    cerr << "TUserID=" << pRspUserLogin->UserID << endl;
-    cerr << "TPassword=" << pRspUserLogin->Password << endl;
-    cerr << "TUserProductInfo=" << pRspUserLogin->UserProductInfo << endl;
-    cerr << "TInterfaceProductInfo=" << pRspUserLogin->InterfaceProductInfo << endl;
-    cerr << "TProtocolInfo=" << pRspUserLogin->ProtocolInfo << endl;
-    cerr << "TMacAddress=" << pRspUserLogin->MacAddress << endl;
-    cerr << "TOneTimePassword=" << pRspUserLogin->OneTimePassword << endl;
-    cerr << "TClientIPAddress=" << pRspUserLogin->ClientIPAddress << endl;
 
+    printf("TradingDay=%s,LoginTime=%s,BrokerID=%s,UserId=%s,SystemName=%s,FrontID=%d,SessionID=%d\n", pRspUserLogin->TradingDay, pRspUserLogin->LoginTime, pRspUserLogin->BrokerID, pRspUserLogin->UserID, pRspUserLogin->SystemName, pRspUserLogin->FrontID, pRspUserLogin->SessionID);
+    printf("MaxOrderRef=%s,SHFETime=%s,DCETime=%s,CZCETime=%s,FFEXTime=%s,INETime=%s\n", pRspUserLogin->MaxOrderRef, pRspUserLogin->SHFETime, pRspUserLogin->DCETime, pRspUserLogin->CZCETime, pRspUserLogin->FFEXTime, pRspUserLogin->INETime);
+    // cerr << "TradingDay=" << pRspUserLogin->TradingDay << endl;
+    // cerr << "TBrokerID=" << pRspUserLogin->BrokerID << endl;
+    // cerr << "TUserID=" << pRspUserLogin->UserID << endl;
+    // cerr << "TPassword=" << pRspUserLogin->Password << endl;
+    // cerr << "TUserProductInfo=" << pRspUserLogin->UserProductInfo << endl;
+    // cerr << "TInterfaceProductInfo=" << pRspUserLogin->InterfaceProductInfo << endl;
+    // cerr << "TProtocolInfo=" << pRspUserLogin->ProtocolInfo << endl;
+    // cerr << "TMacAddress=" << pRspUserLogin->MacAddress << endl;
+    // cerr << "TOneTimePassword=" << pRspUserLogin->OneTimePassword << endl;
+    // cerr << "TClientIPAddress=" << pRspUserLogin->ClientIPAddress << endl;
+    //
     if (bIsLast && !IsErrorRspInfo(pRspInfo)) {
 	// 保存会话参数
 	FRONT_ID = pRspUserLogin->FrontID;
@@ -102,11 +107,11 @@ void CTraderSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField
     ///经纪公司代码
     cerr << "BrokerID" << pSettlementInfoConfirm->BrokerID;
     ///投资者代码
-    pcerr << "InvertorID" << SettlementInfoConfirm->InvestorID;
+    cerr << "InvertorID" << pSettlementInfoConfirm->InvestorID;
     ///确认日期
-    pcerr << "confirmdate" << SettlementInfoConfirm->ConfirmDate;
+    cerr << "confirmdate" << pSettlementInfoConfirm->ConfirmDate;
     ///确认时间
-    pcerr << "confirmtime" << SettlementInfoConfirm->ConfirmTime;
+    cerr << "confirmtime" << pSettlementInfoConfirm->ConfirmTime;
     if (pRspInfo->ErrorID == 0) {
 	///请求查询合约
 	ReqQryInstrument();
