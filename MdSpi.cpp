@@ -89,7 +89,8 @@ void CMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin,
 void CMdSpi::SubscribeMarketData()
 {
     cerr << "--->>> " << __FUNCTION__ << endl;
-    char* pp[] = { "IF1804", "IF1805" };
+    //char* pp[] = { "IF1804", "IF1805" };
+    char* pp[] = { "IF1804" };
     int iResult = pUserApi->SubscribeMarketData(pp, 2);
     cerr << "--->>> send SubscribeMarketData request: " << ((iResult == 0) ? "success" : "failed") << endl;
 }

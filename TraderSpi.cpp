@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <string.h>
+#include <unistd.h>
 using namespace std;
 
 
@@ -31,8 +32,9 @@ TThostFtdcOrderRefType ORDER_REF;   //报单引用
 void PrintOut(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
 
-    printf("ErrorCode=[%d], ErrorMsg=[%s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
-    printf("RequestID=[%d], bIsLast=[%d]\n", nRequestID, bIsLast);
+    cerr << "ErrorCode=" << pRspInfo->ErrorID <<  "ErrorMsg=" << pRspInfo->ErrorMsg << endl;
+//    printf("ErrorCode=[%d], ErrorMsg=[%s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+//    printf("RequestID=[%d], bIsLast=[%d]\n", nRequestID, bIsLast);
 }
 
 void CTraderSpi::OnFrontConnected()
@@ -57,7 +59,7 @@ void CTraderSpi::ReqUserLogin()
 void CTraderSpi::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
     cerr << "--->>> " << __FUNCTION__ << endl;
-    PrintOut(pRspInfo, nRequestID, bIsLast);
+    //PrintOut(pRspInfo, nRequestID, bIsLast);
     // copy from ctp documents demo
     if (pRspInfo->ErrorID != 0) {
 	return;
@@ -104,15 +106,15 @@ void CTraderSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField
 {
     cerr << "--->>> "
 	 << "OnRspSettlementInfoConfirm" << endl;
-    PrintOut(pRspInfo, nRequestID, bIsLast);
+    //PrintOut(pRspInfo, nRequestID, bIsLast);
     ///经纪公司代码
-    cerr << "BrokerID" << pSettlementInfoConfirm->BrokerID;
+    cerr << "BrokerID=" << pSettlementInfoConfirm->BrokerID << endl;
     ///投资者代码
-    cerr << "InvertorID" << pSettlementInfoConfirm->InvestorID;
+    cerr << "InvertorID=" << pSettlementInfoConfirm->InvestorID << endl;
     ///确认日期
-    cerr << "confirmdate" << pSettlementInfoConfirm->ConfirmDate;
+    cerr << "confirmdate=" << pSettlementInfoConfirm->ConfirmDate << endl;
     ///确认时间
-    cerr << "confirmtime" << pSettlementInfoConfirm->ConfirmTime;
+    cerr << "confirmtime=" << pSettlementInfoConfirm->ConfirmTime << endl;
     if (pRspInfo->ErrorID == 0) {
 	///请求查询合约
 	ReqQryInstrument();
@@ -130,9 +132,8 @@ void CTraderSpi::ReqQryInstrument()
 
 void CTraderSpi::OnRspQryInstrument(CThostFtdcInstrumentField* pInstrument, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
-    cerr << "--->>> "
-	 << "OnRspQryInstrument" << endl;
-    PrintOut(pRspInfo, nRequestID, bIsLast);
+    cerr << "--->>> " << "OnRspQryInstrument" << endl;
+    ////PrintOut(pRspInfo, nRequestID, bIsLast);
     ///合约代码
     cerr << "InstrumentID=" << pInstrument->InstrumentID << endl;
     ///交易所代码
@@ -210,21 +211,25 @@ void CTraderSpi::OnRspQryInstrument(CThostFtdcInstrumentField* pInstrument, CTho
 
 void CTraderSpi::ReqQryTradingAccount()
 {
+	sleep(1);
     CThostFtdcQryTradingAccountField req;
     memset(&req, 0, sizeof(req));
     strcpy(req.BrokerID, "9999");
     strcpy(req.InvestorID, "067938");
     int iResult = pUserApi->ReqQryTradingAccount(&req, ++iRequestID);
     cerr << "--->>> sent ReqQryTradingAccount request: " << ((iResult == 0) ? "success" : "failed") << endl;
+    //cerr << "iResult=" << iResult << endl;
 }
 
 void CTraderSpi::OnRspQryTradingAccount(CThostFtdcTradingAccountField* pTradingAccount, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
     cerr << "--->>> "
 	 << "OnRspQryTradingAccount" << endl;
-    PrintOut(pRspInfo, nRequestID, bIsLast);
+    ////PrintOut(pRspInfo, nRequestID, bIsLast);
     ///经纪公司代码
-    cerr << "brokerid=" << pTradingAccount->BrokerID;
+    //cerr << "ErrorID=" << pRspInfo->ErrorID << endl;
+    //cerr << "ErrorMsg=" << pRspInfo->ErrorMsg << endl;
+    cerr << "brokerid=" << pTradingAccount->BrokerID << endl;
     ///投资者帐号
     cerr << "AccountID=" << pTradingAccount->AccountID << endl;
     ///上次质押金额
@@ -326,6 +331,7 @@ void CTraderSpi::OnRspQryTradingAccount(CThostFtdcTradingAccountField* pTradingA
 
 void CTraderSpi::ReqQryInvestorPosition()
 {
+	sleep(1);
     CThostFtdcQryInvestorPositionField req;
     memset(&req, 0, sizeof(req));
     strcpy(req.BrokerID, BROKER_ID);
@@ -339,100 +345,102 @@ void CTraderSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* pInve
 {
     cerr << "--->>> "
 	 << "OnRspQryInvestorPosition" << endl;
-    PrintOut(pRspInfo, nRequestID, bIsLast);
+    ////PrintOut(pRspInfo, nRequestID, bIsLast);
     ///合约代码
+    //cerr << "ErrorID=" << pRspInfo->ErrorID << endl;
+    //cerr << "ErrorMsg=" << pRspInfo->ErrorMsg << endl;
     cerr << "InstrumentID=" << pInvestorPosition->InstrumentID << endl;
     ///经纪公司代码
     cerr << "brokerID=" << pInvestorPosition->BrokerID << endl;
-    ///投资者代码
+    /////投资者代码
     cerr << "InvestorID=" << pInvestorPosition->InvestorID << endl;
-    ///持仓多空方向
+    /////持仓多空方向
     cerr << "PosiDirection=" << pInvestorPosition->PosiDirection << endl;
-    ///投机套保标志
+    /////投机套保标志
     cerr << "HedgeFlag=" << pInvestorPosition->HedgeFlag << endl;
-    ///持仓日期
+    /////持仓日期
     cerr << "PositionDate=" << pInvestorPosition->PositionDate << endl;
-    ///上日持仓
+    /////上日持仓
     cerr << "YdPosition=" << pInvestorPosition->YdPosition << endl;
-    ///今日持仓
+    /////今日持仓
     cerr << "Position=" << pInvestorPosition->Position << endl;
-    ///多头冻结
+    /////多头冻结
     cerr << "LongFrozen=" << pInvestorPosition->LongFrozen << endl;
-    ///空头冻结
+    /////空头冻结
     cerr << "ShortFrozen=" << pInvestorPosition->ShortFrozen << endl;
-    ///开仓冻结金额
+    /////开仓冻结金额
     cerr << "LongFrozenAmount=" << pInvestorPosition->LongFrozenAmount << endl;
-    ///开仓冻结金额
+    /////开仓冻结金额
     cerr << "ShortFrozenAmount=" << pInvestorPosition->ShortFrozenAmount << endl;
-    ///开仓量
+    /////开仓量
     cerr << "OpenVolume=" << pInvestorPosition->OpenVolume << endl;
-    ///平仓量
+    /////平仓量
     cerr << "CloseVolume=" << pInvestorPosition->CloseVolume << endl;
-    ///开仓金额
+    /////开仓金额
     cerr << "OpenAmount=" << pInvestorPosition->OpenAmount << endl;
-    ///平仓金额
+    /////平仓金额
     cerr << "CloseAmount=" << pInvestorPosition->CloseAmount << endl;
-    ///持仓成本
+    /////持仓成本
     cerr << "PositionCost=" << pInvestorPosition->PositionCost << endl;
-    ///上次占用的保证金
+    /////上次占用的保证金
     cerr << "PreMargin=" << pInvestorPosition->PreMargin << endl;
-    ///占用的保证金
+    /////占用的保证金
     cerr << "UseMargin=" << pInvestorPosition->UseMargin << endl;
-    ///冻结的保证金
+    /////冻结的保证金
     cerr << "FrozenMargin=" << pInvestorPosition->FrozenMargin << endl;
-    ///冻结的资金
+    /////冻结的资金
     cerr << "FrozenCash=" << pInvestorPosition->FrozenCash << endl;
-    ///冻结的手续费
+    /////冻结的手续费
     cerr << "FrozenCommission=" << pInvestorPosition->FrozenCommission << endl;
-    ///资金差额
+    /////资金差额
     cerr << "CashIn=" << pInvestorPosition->CashIn << endl;
-    ///手续费
+    /////手续费
     cerr << "Commission=" << pInvestorPosition->Commission << endl;
-    ///平仓盈亏
+    /////平仓盈亏
     cerr << "CloseProfit=" << pInvestorPosition->CloseProfit << endl;
-    ///持仓盈亏
+    /////持仓盈亏
     cerr << "PositionProfit=" << pInvestorPosition->PositionProfit << endl;
-    ///上次结算价
+    /////上次结算价
     cerr << "PreSettlementPrice=" << pInvestorPosition->PreSettlementPrice << endl;
-    ///本次结算价
+    /////本次结算价
     cerr << "SettlementPrice=" << pInvestorPosition->SettlementPrice << endl;
-    ///交易日
+    /////交易日
     cerr << "TradingDay=" << pInvestorPosition->TradingDay << endl;
-    ///结算编号
+    /////结算编号
     cerr << "SettlementID=" << pInvestorPosition->SettlementID << endl;
-    ///开仓成本
+    /////开仓成本
     cerr << "OpenCost=" << pInvestorPosition->OpenCost << endl;
-    ///交易所保证金
+    /////交易所保证金
     cerr << "ExchangeMargin=" << pInvestorPosition->ExchangeMargin << endl;
-    ///组合成交形成的持仓
+    /////组合成交形成的持仓
     cerr << "CombPosition=" << pInvestorPosition->CombPosition << endl;
-    ///组合多头冻结
+    /////组合多头冻结
     cerr << "CombLongFrozen=" << pInvestorPosition->CombLongFrozen << endl;
-    ///组合空头冻结
+    /////组合空头冻结
     cerr << "CombShortFrozen=" << pInvestorPosition->CombShortFrozen << endl;
-    ///逐日盯市平仓盈亏
+    /////逐日盯市平仓盈亏
     cerr << "CloseProfitByDate=" << pInvestorPosition->CloseProfitByDate << endl;
-    ///逐笔对冲平仓盈亏
+    /////逐笔对冲平仓盈亏
     cerr << "CloseProfitByTrade=" << pInvestorPosition->CloseProfitByTrade << endl;
-    ///今日持仓
+    /////今日持仓
     cerr << "TodayPosition=" << pInvestorPosition->TodayPosition << endl;
-    ///保证金率
+    /////保证金率
     cerr << "MarginRateByMoney=" << pInvestorPosition->MarginRateByMoney << endl;
-    ///保证金率(按手数)
+    /////保证金率(按手数)
     cerr << "MarginRateByVolume=" << pInvestorPosition->MarginRateByVolume << endl;
-    ///执行冻结
+    /////执行冻结
     cerr << "StrikeFrozen=" << pInvestorPosition->StrikeFrozen << endl;
-    ///执行冻结金额
+    /////执行冻结金额
     cerr << "StrikeFrozenAmount=" << pInvestorPosition->StrikeFrozenAmount << endl;
-    ///放弃执行冻结
+    /////放弃执行冻结
     cerr << "AbandonFrozen=" << pInvestorPosition->AbandonFrozen << endl;
-    ///交易所代码
+    /////交易所代码
     cerr << "ExchangeID=" << pInvestorPosition->ExchangeID << endl;
-    ///执行冻结的昨仓
+    /////执行冻结的昨仓
     cerr << "YdStrikeFrozen=" << pInvestorPosition->YdStrikeFrozen << endl;
     if (bIsLast && !IsErrorRspInfo(pRspInfo)) {
 	///报单录入请求
-	ReqOrderInsert();
+	//ReqOrderInsert();
     }
 }
 
@@ -493,7 +501,7 @@ void CTraderSpi::OnRspOrderInsert(CThostFtdcInputOrderField* pInputOrder, CThost
 {
     cerr << "--->>> "
 	 << "OnRspOrderInsert" << endl;
-    PrintOut(pRspInfo, nRequestID, bIsLast);
+    ////PrintOut(pRspInfo, nRequestID, bIsLast);
     ///经纪公司代码
     cerr << "brokerid=" << pInputOrder->BrokerID << endl;
     ///投资者代码
@@ -590,7 +598,7 @@ void CTraderSpi::OnRspOrderAction(CThostFtdcInputOrderActionField* pInputOrderAc
 {
     cerr << "--->>> "
 	 << "OnRspOrderAction" << endl;
-    PrintOut(pRspInfo, nRequestID, bIsLast);
+    //PrintOut(pRspInfo, nRequestID, bIsLast);
     ///经纪公司代码
     cerr << "brokerid" << pInputOrderAction->BrokerID << endl;
     ///投资者代码
@@ -835,7 +843,7 @@ void CTraderSpi::OnRspError(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bo
 {
     cerr << "--->>> "
 	 << "OnRspError" << endl;
-    PrintOut(pRspInfo, nRequestID, bIsLast);
+    //PrintOut(pRspInfo, nRequestID, bIsLast);
 }
 
 bool CTraderSpi::IsErrorRspInfo(CThostFtdcRspInfoField* pRspInfo)
