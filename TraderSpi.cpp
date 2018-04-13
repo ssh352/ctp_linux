@@ -863,7 +863,7 @@ void CTraderSpi::OnFrontDisconnected(int nReason)
 {
     cout << "--->>> "
 	 << "OnFrontDisconnected" << endl;
-    cout << "--->>> Reason = " << nReason << endl;
+    cout << "--->>> Reason = " << hex << nReason << endl;
 }
 
 void CTraderSpi::OnHeartBeatWarning(int nTimeLapse)
