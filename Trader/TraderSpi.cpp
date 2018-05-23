@@ -1,5 +1,5 @@
 // #include "ThostFtdcTraderApi.h"
-#include "TraderSpi.h"
+#include "../include/TraderSpi.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
@@ -11,7 +11,7 @@ using namespace std;
 #pragma warning(disable : 4996)
 
 // USER_API参数
-extern CThostFtdcTraderApi* pUserApi;
+extern CThostFtdcTraderApi* pUserTraderApi;
 
 // 配置参数
 TThostFtdcBrokerIDType BROKER_ID = "9999";	     // 经纪公司代码
@@ -29,7 +29,7 @@ TThostFtdcFrontIDType FRONT_ID;     //前置编号
 TThostFtdcSessionIDType SESSION_ID; //会话编号
 TThostFtdcOrderRefType ORDER_REF;   //报单引用
 
-void PrintOut(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
+void CTraderSpi::PrintOut(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (pRspInfo == NULL){
 		cout << "pRspInfo is null!" << endl;
@@ -55,7 +55,7 @@ void CTraderSpi::ReqUserLogin()
     strcpy(req.BrokerID, "9999");
     strcpy(req.UserID, "067938");
     strcpy(req.Password, "6432281");
-    int iResult = pUserApi->ReqUserLogin(&req, ++iRequestID);
+    int iResult = pUserTraderApi->ReqUserLogin(&req, ++iRequestID);
     cout << "--->>> sent login request: " << ((iResult == 0) ? "success" : "failed") << endl;
 }
 
@@ -93,7 +93,7 @@ void CTraderSpi::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin, CTho
 	iNextOrderRef++;
 	sprintf(ORDER_REF, "%d", iNextOrderRef);
 	///获取当前交易日
-	cout << "--->>> call api function GetTradingDay = " << pUserApi->GetTradingDay() << endl;
+	cout << "--->>> call api function GetTradingDay = " << pUserTraderApi->GetTradingDay() << endl;
 	///投资者结算结果确认
 	ReqSettlementInfoConfirm();
     }
@@ -105,7 +105,7 @@ void CTraderSpi::ReqSettlementInfoConfirm()
     memset(&req, 0, sizeof(req));
     strcpy(req.BrokerID, "9999");
     strcpy(req.InvestorID, "067938");
-    int iResult = pUserApi->ReqSettlementInfoConfirm(&req, ++iRequestID);
+    int iResult = pUserTraderApi->ReqSettlementInfoConfirm(&req, ++iRequestID);
     cout << "--->>> investor confirm settlement: " << ((iResult == 0) ? "success" : "failed") << endl;
 }
 
@@ -137,7 +137,7 @@ void CTraderSpi::ReqQryInstrument()
     CThostFtdcQryInstrumentField req;
     memset(&req, 0, sizeof(req));
     strcpy(req.InstrumentID, INSTRUMENT_ID);
-    int iResult = pUserApi->ReqQryInstrument(&req, ++iRequestID);
+    int iResult = pUserTraderApi->ReqQryInstrument(&req, ++iRequestID);
     cout << "--->>> send ReqQryInstrument request: " << ((iResult == 0) ? "success" : "failed") << endl;
 }
 
@@ -231,7 +231,7 @@ void CTraderSpi::ReqQryTradingAccount()
     memset(&req, 0, sizeof(req));
     strcpy(req.BrokerID, "9999");
     strcpy(req.InvestorID, "067938");
-    int iResult = pUserApi->ReqQryTradingAccount(&req, ++iRequestID);
+    int iResult = pUserTraderApi->ReqQryTradingAccount(&req, ++iRequestID);
     cout << "--->>> sent ReqQryTradingAccount request: " << ((iResult == 0) ? "success" : "failed") << endl;
 }
 
@@ -353,7 +353,7 @@ void CTraderSpi::ReqQryInvestorPosition()
     strcpy(req.BrokerID, BROKER_ID);
     strcpy(req.InvestorID, INVESTOR_ID);
     strcpy(req.InstrumentID, INSTRUMENT_ID);
-    int iResult = pUserApi->ReqQryInvestorPosition(&req, ++iRequestID);
+    int iResult = pUserTraderApi->ReqQryInvestorPosition(&req, ++iRequestID);
     cout << "--->>> sent ReqQryInvestorPosition request: " << ((iResult == 0) ? "success" : "failed") << endl;
 }
 
@@ -511,7 +511,7 @@ void CTraderSpi::ReqOrderInsert()
     ///用户强评标志: 否
     req.UserForceClose = 0;
 
-    int iResult = pUserApi->ReqOrderInsert(&req, ++iRequestID);
+    int iResult = pUserTraderApi->ReqOrderInsert(&req, ++iRequestID);
     cout << "--->>> sent orderInsert request: " << ((iResult == 0) ? "success" : "failed") << endl;
 }
 
@@ -611,7 +611,7 @@ void CTraderSpi::ReqOrderAction(CThostFtdcOrderField* pOrder)
     ///合约代码
     strcpy(req.InstrumentID, pOrder->InstrumentID);
 
-    int iResult = pUserApi->ReqOrderAction(&req, ++iRequestID);
+    int iResult = pUserTraderApi->ReqOrderAction(&req, ++iRequestID);
     cout << "--->>> sent orderaction request: " << ((iResult == 0) ? "success" : "failed") << endl;
     ORDER_ACTION_SENT = true;
 }

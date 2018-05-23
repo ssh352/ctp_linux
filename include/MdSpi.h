@@ -41,4 +41,5 @@ private:
 	void SubscribeMarketData();
 	// 
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
+	void PrintOut(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast);
 };

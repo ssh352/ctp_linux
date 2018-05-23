@@ -1,10 +1,9 @@
-// testTraderApi.cpp : 定义控制台应用程序的入口点。
 //
-#include "ThostFtdcTraderApi.h"
-#include "TraderSpi.h"
+#include "../include/ThostFtdcTraderApi.h"
+#include "../include/TraderSpi.h"
 
 // UserApi对象
-CThostFtdcTraderApi* pUserApi;
+CThostFtdcTraderApi* pUserTraderApi;
 
 // 配置参数
 // char  FRONT_ADDR[] = "tcp://asp-sim2-front1.financial-trading-platform.com:26205";		// 前置地址
@@ -22,15 +21,15 @@ int main(void)
 {
     char FRONT_ADDR[] = "tcp://180.168.146.187:10001"; // 前置地址
     //  init UserApi
-    pUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi("./ctp_linux_trader/"); // 创建UserApi
+    pUserTraderApi = CThostFtdcTraderApi::CreateFtdcTraderApi("./log_trader/"); // set log path 
     CTraderSpi* pUserSpi = new CTraderSpi();
-    pUserApi->RegisterSpi((CThostFtdcTraderSpi*)pUserSpi); // 注册事件类
-    pUserApi->SubscribePublicTopic(THOST_TERT_RESTART);    // 注册公有流
-    pUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);   // 注册私有流
-    pUserApi->RegisterFront(FRONT_ADDR);		   // connect
-    pUserApi->Init();
+    pUserTraderApi->RegisterSpi((CThostFtdcTraderSpi*)pUserSpi); // 注册事件类
+    pUserTraderApi->SubscribePublicTopic(THOST_TERT_RESTART);    // 注册公有流
+    pUserTraderApi->SubscribePrivateTopic(THOST_TERT_RESTART);   // 注册私有流
+    pUserTraderApi->RegisterFront(FRONT_ADDR);		   // connect
+    pUserTraderApi->Init();
 
-    pUserApi->Join();
-    //	pUserApi->Release();
+    pUserTraderApi->Join();
+    //	pUserTraderApi->Release();
 }
 

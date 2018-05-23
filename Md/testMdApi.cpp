@@ -1,11 +1,10 @@
-// testTraderApi.cpp : 定义控制台应用程序的入口点。
 //
 
-#include "MdSpi.h"
-#include "ThostFtdcMdApi.h"
+#include "../include/MdSpi.h"
+#include "../include/ThostFtdcMdApi.h"
 
 // UserApi对象
-CThostFtdcMdApi* pUserApi;
+CThostFtdcMdApi* pUserMdApi;
 
 // 配置参数
 // TThostFtdcBrokerIDType BROKER_ID = "6000";	// 经纪公司代码
@@ -22,13 +21,13 @@ int main(void)
     //char FRONT_ADDR[] = "tcp://180.168.146.187:10011"; // 前置地址
     char FRONT_ADDR[] = "tcp://180.168.214.246:41213"; // 前置地址
     // 初始化UserApi
-    pUserApi = CThostFtdcMdApi::CreateFtdcMdApi("./ctp_linux_md/"); // 创建UserApi
+    pUserMdApi = CThostFtdcMdApi::CreateFtdcMdApi("./log_md/"); // 创建UserApi
     CThostFtdcMdSpi* pUserSpi = new CMdSpi();
-    pUserApi->RegisterSpi(pUserSpi);     // 注册事件类
-    pUserApi->RegisterFront(FRONT_ADDR); // connect
-    pUserApi->Init();
+    pUserMdApi->RegisterSpi(pUserSpi);     // 注册事件类
+    pUserMdApi->RegisterFront(FRONT_ADDR); // connect
+    pUserMdApi->Init();
 
-     pUserApi->Join();
-    //	pUserApi->Release();
+     pUserMdApi->Join();
+    //	pUserMdApi->Release();
 }
 

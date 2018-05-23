@@ -1,4 +1,4 @@
-#include "MdSpi.h"
+#include "../include/MdSpi.h"
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
@@ -7,7 +7,7 @@ using namespace std;
 #pragma warning(disable : 4996)
 
 // USER_API参数
-extern CThostFtdcMdApi* pUserApi;
+extern CThostFtdcMdApi* pUserMdApi;
 
 // 配置参数
 // extern char FRONT_ADDR[];
@@ -20,7 +20,7 @@ extern CThostFtdcMdApi* pUserApi;
 // 请求编号
 extern int iRequestID;
 
-void PrintOut(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
+void CMdSpi::PrintOut(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
 
     printf("ErrorCode=[%d], ErrorMsg=[%s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
@@ -60,7 +60,7 @@ void CMdSpi::ReqUserLogin()
     strcpy(req.BrokerID, "8070");
     strcpy(req.UserID, "067938");
     strcpy(req.Password, "6432281");
-    int iResult = pUserApi->ReqUserLogin(&req, ++iRequestID);
+    int iResult = pUserMdApi->ReqUserLogin(&req, ++iRequestID);
     cerr << "--->>> sent login request: " << ((iResult == 0) ? "success" : "failed") << endl;
 }
 
@@ -81,7 +81,7 @@ void CMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin,
     printf("MaxOrderRef=%s,SHFETime=%s,DCETime=%s,CZCETime=%s,FFEXTime=%s,INETime=%s\n", pRspUserLogin->MaxOrderRef, pRspUserLogin->SHFETime, pRspUserLogin->DCETime, pRspUserLogin->CZCETime, pRspUserLogin->FFEXTime, pRspUserLogin->INETime);
 
     if (bIsLast && !IsErrorRspInfo(pRspInfo)) {
-	cerr << "--->>> call api function GetTradingDay = " << pUserApi->GetTradingDay() << endl;
+	cerr << "--->>> call api function GetTradingDay = " << pUserMdApi->GetTradingDay() << endl;
     }
     SubscribeMarketData();
 }
@@ -91,7 +91,7 @@ void CMdSpi::SubscribeMarketData()
     cerr << "--->>> " << __FUNCTION__ << endl;
     //char* pp[] = { "IF1804", "IF1805" };
     char* pp[] = { "IF1804" };
-    int iResult = pUserApi->SubscribeMarketData(pp, 2);
+    int iResult = pUserMdApi->SubscribeMarketData(pp, 2);
     cerr << "--->>> send SubscribeMarketData request: " << ((iResult == 0) ? "success" : "failed") << endl;
 }
 

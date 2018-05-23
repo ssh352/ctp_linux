@@ -65,4 +65,6 @@ private:
 	bool IsMyOrder(CThostFtdcOrderField *pOrder);
 	// 是否正在交易的报单
 	bool IsTradingOrder(CThostFtdcOrderField *pOrder);
+
+	void PrintOut(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast);
 };
