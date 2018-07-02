@@ -1,0 +1,31 @@
+#include "md_spi.h"
+
+Document d;
+zmq::context_t context (1);
+zmq::socket_t publisher (context, ZMQ_PUB);
+
+int main(int argc, char *argv[])
+{
+	if (argc != 2) {
+		cerr << "Usage: " << argv[0] << " ctp_config_file" << endl;
+		return -1;
+	}
+
+	string config_path = argv[1];
+	config_path = "../config/" + config_path;
+	if ( !read_json(config_path.c_str(),d) ){
+		cout << "the config.json file parse error!" << endl;
+		return 0;
+	}
+
+	logger::init(argv[0]);
+	publisher.bind("tcp://*:5556");
+
+	GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+	CMdSpi *cmdspi = new CMdSpi();
+	cmdspi->load_config(d);
+	cmdspi->connect();
+
+	cout << "test.....";
+}

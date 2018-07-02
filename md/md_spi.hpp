@@ -1,15 +1,54 @@
-#include "MdSpi.h"
-#include <iostream>
-// #include <stdio.h>
-// #include <string.h>
-// using namespace std;
+#pragma once
+#include "ThostFtdcMdApi.h"
+#include "file_utils.h"
+#include "addressbook.pb.h"
+#include <zmq.hpp>
 
-#pragma warning(disable : 4996)
-
-// extern CThostFtdcMdApi* pUserMdApi;
 extern Document d;
+extern zmq::context_t context;
+extern zmq::socket_t publisher;
 
-extern int iRequestID;
+class CMdSpi : public CThostFtdcMdSpi
+{
+	private:
+		CThostFtdcMdApi *userapi;
+		string broker_id;
+		string user_id;
+		string passwd;
+		string front_id;
+		int reqid;
+
+	public:
+		void ReqUserLogin();
+		void logout();
+		void SubscribeMarketData(const vector<string> &instruments,const vector<string> &markets);
+		bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
+		CMdSpi();
+		~CMdSpi();
+
+		void load_config(const Document &d);
+		virtual void connect();
+	public:
+		virtual void OnRspError(CThostFtdcRspInfoField *pRspInfo,
+				int nRequestID, bool bIsLast);
+
+		virtual void OnFrontDisconnected(int nReason);
+
+		virtual void OnHeartBeatWarning(int nTimeLapse);
+
+		virtual void OnFrontConnected();
+
+		virtual void OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+		virtual void OnRspUserLogout(CThostFtdcUserLogoutField *pUserLogout, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+		virtual void OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+		virtual void OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
+		virtual void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData);
+
+};
+
 
 CMdSpi::CMdSpi(): userapi(nullptr), reqid(0)
 {
@@ -27,8 +66,7 @@ void CMdSpi::connect()
 {
 	if (userapi == nullptr)
 	{
-
-		userapi = CThostFtdcMdApi::CreateFtdcMdApi("../log/md/"); // ´´½¨UserApi
+		userapi = CThostFtdcMdApi::CreateFtdcMdApi("../log/md/"); // Â´Â´Â½Â¨UserApi
 
 		if (!userapi)
 		{
@@ -47,7 +85,6 @@ void CMdSpi::connect()
 void CMdSpi::OnRspError(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
 	cerr << "--->>> " << __FUNCTION__ << endl;
-	PrintOut(pRspInfo, nRequestID, bIsLast);
 	// IsErrorRspInfo(pRspInfo);
 }
 
@@ -56,7 +93,7 @@ void CMdSpi::OnFrontDisconnected(int nReason)
 	// cerr << "--->>> " << __FUNCTION__ << endl;
 	// cerr << "--->>> Reason = " << nReason << endl;
 	LOG(ERROR) << "Disconect from ctp front." << " Reason code "<<nReason ;
-
+        // publisher.send("OnFrontDisconnected");
 }
 
 void CMdSpi::OnHeartBeatWarning(int nTimeLapse)
@@ -82,7 +119,7 @@ void CMdSpi::ReqUserLogin()
 	strcpy(req.BrokerID, broker_id.c_str());
 	strcpy(req.UserID, user_id.c_str());
 	strcpy(req.Password, passwd.c_str());
-	int iResult = userapi->ReqUserLogin(&req, ++iRequestID);
+	int iResult = userapi->ReqUserLogin(&req, ++reqid);
 	// FIXME: should reconnect later instead of ASSERT
 	LOG(INFO) << "--->>> sent login request: " << ((iResult == 0) ? "success" : "failed") << endl;
 
@@ -163,7 +200,7 @@ void CMdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificInst
 	// cerr << "--->>> " << __FUNCTION__ << endl;
 	if (pRspInfo != nullptr && pRspInfo->ErrorID != 0)
 	{
-		LOG[ERROR] << "[OnRspSubMarketData]" << "(errID)" << pRspInfo->ErrorID << "(errMsg)" << pRspInfo->ErrorMsg;
+		LOG(ERROR) << "[OnRspSubMarketData]" << "(errID)" << pRspInfo->ErrorID << "(errMsg)" << pRspInfo->ErrorMsg;
 	}
 
 }
@@ -171,7 +208,6 @@ void CMdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificInst
 void CMdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificInstrument, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
 	// cerr << "--->>> " << __FUNCTION__ << endl;
-	// PrintOut(pRspInfo, nRequestID, bIsLast);
 	// printf("InstrumentID=%s\n", pSpecificInstrument->InstrumentID);
 }
 

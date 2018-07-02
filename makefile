@@ -1,26 +1,46 @@
-#def var,compile macro
+LIBS := zmq glog thostmduserapi# 静态库文件名
+INCLUDES:= ./include ./api          # 头文件目录
+VPATH = md:include:trade
+
+LIBNAME := $(addprefix -l,$(LIBS))
+LIBNAME += `pkg-config --cflags --libs protobuf`
+
+ctp_md_obj = ctp_md.o md_spi.o addressbook.pb.o file_utils.o
+ctp_trade_obj = ctp_trade.o trade_spi.o addressbook.pb.o
+
+CC:=g++
+CFLAGS := -std=c++11 -g -Wall -O3
+CPPFLAGS := $(CFLAGS)
+CPPFLAGS += $(addprefix -I,$(INCLUDES))
+CPPFLAGS += -MMD
 CC = g++
-LIBNAME = -lthostmduserapi -lthosttraderapi
-LIBPATH = -L/home/zhangkai/ctp_linux/lib
-INCLUDEPATH = -I/home/zhangkai/ctp_linux/include
-# gcc will use this var
-#CFLAGS = -Wall
 
-OBJDIR = obj
-VPATH = src
-SOURCE = $(wildcard $(VPATH)/*.cpp)
-OBJS = $(addprefix $(OBJDIR)/, $(patsubst %.cpp,%.o,$(notdir $(SOURCE))))
-OUTNAME = linux_main
-#OBJS = ./obj/quote_spi.o ./obj/FileUtils.o ./obj/trade_spi.o ./obj/xtp_api_demo.o 
-#INCLUDES = /usr/local/lib
+ctp_md: $(ctp_md_obj)
+	$(CC) -o ctp_md $(ctp_md_obj) $(LIBNAME)
+	# mv *.d dmk/
+	# mv *.o build/
 
-#def command
-main: ${OBJS}
-	${CC} -o ${OUTNAME} ${OBJS} ${INCLUDEPATH} ${LIBNAME} ${LIBPATH}
+ctp_trade: $(ctp_trade_obj)
+	$(CC) -o ctp_trade $(ctp_trade_obj) $(LIBNAME)
+	# mv *.d dmk/
+	# mv *.o build/
 
-#def command
+ctp_md.o: ctp_md.cpp md_spi.h
+
+ctp_trade.o: ctp_trade.cpp trade_spi.h
+
+md_spi.o: md_spi.h md_spi.cpp 
+
+trade_spi.o : trade_spi.h trade_spi.cpp
+
+addressbook.pb.o : addressbook.pb.h
+
+file_utils.o : file_utils.h
+
 clean:
-	rm -f ${OBJS} ${OUTNAME}
+	rm -f *.o 
+	rm -f *.d
+	rm -f ctp_md ctp_trade
 
-${OBJDIR}/%.o: %.cpp
-	gcc -c $< -o $@
+# ${OBJDIR}/%.o: %.cpp
+#         gcc -c $< -o $@

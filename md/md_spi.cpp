@@ -1,15 +1,8 @@
-#include "MdSpi.h"
-#include <iostream>
-// #include <stdio.h>
-// #include <string.h>
-// using namespace std;
+#include "md_spi.h"
 
-#pragma warning(disable : 4996)
-
-// extern CThostFtdcMdApi* pUserMdApi;
 extern Document d;
-
-extern int iRequestID;
+extern zmq::context_t context;
+extern zmq::socket_t publisher;
 
 CMdSpi::CMdSpi(): userapi(nullptr), reqid(0)
 {
@@ -27,7 +20,6 @@ void CMdSpi::connect()
 {
 	if (userapi == nullptr)
 	{
-
 		userapi = CThostFtdcMdApi::CreateFtdcMdApi("../log/md/"); // ´´½¨UserApi
 
 		if (!userapi)
@@ -47,7 +39,6 @@ void CMdSpi::connect()
 void CMdSpi::OnRspError(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
 	cerr << "--->>> " << __FUNCTION__ << endl;
-	PrintOut(pRspInfo, nRequestID, bIsLast);
 	// IsErrorRspInfo(pRspInfo);
 }
 
@@ -56,7 +47,7 @@ void CMdSpi::OnFrontDisconnected(int nReason)
 	// cerr << "--->>> " << __FUNCTION__ << endl;
 	// cerr << "--->>> Reason = " << nReason << endl;
 	LOG(ERROR) << "Disconect from ctp front." << " Reason code "<<nReason ;
-
+        // publisher.send("OnFrontDisconnected");
 }
 
 void CMdSpi::OnHeartBeatWarning(int nTimeLapse)
@@ -82,7 +73,7 @@ void CMdSpi::ReqUserLogin()
 	strcpy(req.BrokerID, broker_id.c_str());
 	strcpy(req.UserID, user_id.c_str());
 	strcpy(req.Password, passwd.c_str());
-	int iResult = userapi->ReqUserLogin(&req, ++iRequestID);
+	int iResult = userapi->ReqUserLogin(&req, ++reqid);
 	// FIXME: should reconnect later instead of ASSERT
 	LOG(INFO) << "--->>> sent login request: " << ((iResult == 0) ? "success" : "failed") << endl;
 
@@ -163,7 +154,7 @@ void CMdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificInst
 	// cerr << "--->>> " << __FUNCTION__ << endl;
 	if (pRspInfo != nullptr && pRspInfo->ErrorID != 0)
 	{
-		LOG[ERROR] << "[OnRspSubMarketData]" << "(errID)" << pRspInfo->ErrorID << "(errMsg)" << pRspInfo->ErrorMsg;
+		LOG(ERROR) << "[OnRspSubMarketData]" << "(errID)" << pRspInfo->ErrorID << "(errMsg)" << pRspInfo->ErrorMsg;
 	}
 
 }
@@ -171,7 +162,6 @@ void CMdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificInst
 void CMdSpi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificInstrument, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
 	// cerr << "--->>> " << __FUNCTION__ << endl;
-	// PrintOut(pRspInfo, nRequestID, bIsLast);
 	// printf("InstrumentID=%s\n", pSpecificInstrument->InstrumentID);
 }
 
