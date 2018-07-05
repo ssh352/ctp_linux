@@ -19,7 +19,7 @@ class logger
 	public:
 		static inline void init(const char *name)
 		{
-			string home = "./glog/";
+			string home = "./log/glog/";
 			google::InitGoogleLogging(name);
 			string info_log = home + "_info_";
 			google::SetLogDestination(google::INFO, info_log.c_str());

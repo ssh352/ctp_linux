@@ -12,7 +12,9 @@ int main(int argc, char *argv[])
 	}
 
 	string config_path = argv[1];
-	config_path = "../config/" + config_path;
+	config_path = "./config/" + config_path;
+	std::cout << config_path.c_str() << std::endl;
+	// if ( !read_json("./config/ctp_zhongxin.json",d) ){
 	if ( !read_json(config_path.c_str(),d) ){
 		cout << "the config.json file parse error!" << endl;
 		return 0;
@@ -26,6 +28,4 @@ int main(int argc, char *argv[])
 	CMdSpi *cmdspi = new CMdSpi();
 	cmdspi->load_config(d);
 	cmdspi->connect();
-
-	cout << "test.....";
 }

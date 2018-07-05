@@ -4,10 +4,7 @@ extern Document d;
 extern zmq::context_t context;
 extern zmq::socket_t publisher;
 
-CMdSpi::CMdSpi(): userapi(nullptr), reqid(0)
-{
-
-}
+CMdSpi::CMdSpi(): userapi(nullptr), reqid(0) { }
 
 void CMdSpi::load_config(const Document &d){
 	broker_id = d["broker_id"].GetString();
@@ -20,7 +17,7 @@ void CMdSpi::connect()
 {
 	if (userapi == nullptr)
 	{
-		userapi = CThostFtdcMdApi::CreateFtdcMdApi("../log/md/"); // 创建UserApi
+		userapi = CThostFtdcMdApi::CreateFtdcMdApi("./log/md/"); // 创建UserApi
 
 		if (!userapi)
 		{
@@ -47,7 +44,7 @@ void CMdSpi::OnFrontDisconnected(int nReason)
 	// cerr << "--->>> " << __FUNCTION__ << endl;
 	// cerr << "--->>> Reason = " << nReason << endl;
 	LOG(ERROR) << "Disconect from ctp front." << " Reason code "<<nReason ;
-        // publisher.send("OnFrontDisconnected");
+	// publisher.send("OnFrontDisconnected");
 }
 
 void CMdSpi::OnHeartBeatWarning(int nTimeLapse)
@@ -75,7 +72,9 @@ void CMdSpi::ReqUserLogin()
 	strcpy(req.Password, passwd.c_str());
 	int iResult = userapi->ReqUserLogin(&req, ++reqid);
 	// FIXME: should reconnect later instead of ASSERT
-	LOG(INFO) << "--->>> sent login request: " << ((iResult == 0) ? "success" : "failed") << endl;
+	// LOG(INFO) << "--->>> sent login request: " << ((iResult == 0) ? "success" : "failed") << endl;
+	std::cout << "--->>> sent login request: " << ((iResult == 0) ? "success" : "failed") << endl;
+	
 
 }
 
@@ -94,28 +93,37 @@ void CMdSpi::logout()
 void CMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin,
 		CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
-	if (pRspInfo != nullptr && pRspInfo->ErrorID != 0) {
-		LOG(INFO) << "Login to ctp failed." << "(errid)" << pRspInfo->ErrorID << "(errmsg)" << pRspInfo->ErrorMsg;
-	}
-	else
-	{
-		LOG(INFO) << "Login to ctp successed." << "(Bid)" << pRspUserLogin->BrokerID << "(Uid)" << pRspUserLogin->UserID;
+	// if (pRspInfo != nullptr && pRspInfo->ErrorID != 0) {
+	//         // LOG(INFO) << "Login to ctp failed." << "(errid)" << pRspInfo->ErrorID << "(errmsg)" << pRspInfo->ErrorMsg;
+	//         std::cout << "Login to ctp failed." << "(errid)" << pRspInfo->ErrorID << "(errmsg)" << pRspInfo->ErrorMsg;
+	// }
+	// else
+	// {
+	//         std::cout << "Login to ctp successed." << "(Bid)" << pRspUserLogin->BrokerID << "(Uid)" << pRspUserLogin->UserID;
+	//         // LOG(INFO) << "Login to ctp successed." << "(Bid)" << pRspUserLogin->BrokerID << "(Uid)" << pRspUserLogin->UserID;
+	// }
+        //
+	cerr << "--->>> " << __FUNCTION__ << endl;
+	if (pRspInfo == NULL){
+		std::cout << "pRspInfo is null" << std::endl;
 	}
 
-	// cerr << "--->>> " << __FUNCTION__ << endl;
-	// cout << pRspUserLogin->TradingDay << endl;
-	// cout << pRspUserLogin->LoginTime<< endl;
-	// cout << pRspUserLogin->BrokerID<< endl;
-	// cout << pRspUserLogin->UserID<< endl;
-	// cout << pRspUserLogin->SystemName<< endl;
-	// cout << pRspUserLogin->FrontID<< endl;
-	// cout << pRspUserLogin->SessionID<<endl;
-	// cout << pRspUserLogin->MaxOrderRef << endl;
-	// cout << pRspUserLogin->SHFETime << endl;
-	// cout << pRspUserLogin->DCETime << endl;
-	// cout << pRspUserLogin->CZCETime << endl;
-	// cout << pRspUserLogin->FFEXTime << endl;
-	// cout << pRspUserLogin->INETime << endl;
+	if (pRspUserLogin == NULL ){
+		std::cout << "pRspUserLogin is null" << std::endl;
+	}
+	cout << pRspUserLogin->TradingDay << endl;
+	cout << pRspUserLogin->LoginTime<< endl;
+	cout << pRspUserLogin->BrokerID<< endl;
+	cout << pRspUserLogin->UserID<< endl;
+	cout << pRspUserLogin->SystemName<< endl;
+	cout << pRspUserLogin->FrontID<< endl;
+	cout << pRspUserLogin->SessionID<<endl;
+	cout << pRspUserLogin->MaxOrderRef << endl;
+	cout << pRspUserLogin->SHFETime << endl;
+	cout << pRspUserLogin->DCETime << endl;
+	cout << pRspUserLogin->CZCETime << endl;
+	cout << pRspUserLogin->FFEXTime << endl;
+	cout << pRspUserLogin->INETime << endl;
 	// if (bIsLast && !IsErrorRspInfo(pRspInfo)) {
 	//     cerr << "--->>> call api function GetTradingDay = " << pUserMdApi->GetTradingDay() << endl;
 	// }
