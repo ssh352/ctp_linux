@@ -1,7 +1,7 @@
 #pragma once
 #include "ThostFtdcMdApi.h"
 #include "file_utils.h"
-#include "addressbook.pb.h"
+#include "ctp.pb.h"
 #include <zmq.hpp>
 
 class CMdSpi : public CThostFtdcMdSpi
@@ -17,6 +17,7 @@ class CMdSpi : public CThostFtdcMdSpi
 	public:
 		void ReqUserLogin();
 		void logout();
+		void SubscribeMarketData();
 		void SubscribeMarketData(const vector<string> &instruments,const vector<string> &markets);
 		bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 		CMdSpi();

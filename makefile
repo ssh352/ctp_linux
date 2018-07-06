@@ -5,8 +5,8 @@ VPATH = md:include:trade
 LIBNAME := $(addprefix -l,$(LIBS))
 LIBNAME += `pkg-config --cflags --libs protobuf`
 
-ctp_md_obj = ctp_md.o md_spi.o addressbook.pb.o file_utils.o
-ctp_trade_obj = ctp_trade.o trade_spi.o addressbook.pb.o
+ctp_md_obj = ctp_md.o md_spi.o ctp.pb.o file_utils.o
+ctp_trade_obj = ctp_trade.o trade_spi.o ctp.pb.o
 
 CC:=g++
 CFLAGS := -std=c++11 -g -Wall -O3
@@ -17,13 +17,13 @@ CC = g++
 
 ctp_md: $(ctp_md_obj)
 	$(CC) -o ctp_md $(ctp_md_obj) $(LIBNAME)
-	# mv *.d dmk/
-	# mv *.o build/
+	mv *.d build/
+	mv *.o build/
 
 ctp_trade: $(ctp_trade_obj)
 	$(CC) -o ctp_trade $(ctp_trade_obj) $(LIBNAME)
-	# mv *.d dmk/
-	# mv *.o build/
+	mv *.d build/
+	mv *.o build/
 
 ctp_md.o: ctp_md.cpp md_spi.h
 
@@ -33,7 +33,7 @@ md_spi.o: md_spi.h md_spi.cpp
 
 trade_spi.o : trade_spi.h trade_spi.cpp
 
-addressbook.pb.o : addressbook.pb.h
+ctp.pb.o : ctp.pb.h
 
 file_utils.o : file_utils.h
 

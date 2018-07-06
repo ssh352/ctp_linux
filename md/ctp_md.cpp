@@ -6,6 +6,8 @@ zmq::socket_t publisher (context, ZMQ_PUB);
 
 int main(int argc, char *argv[])
 {
+	GOOGLE_PROTOBUF_VERIFY_VERSION;
+
 	if (argc != 2) {
 		cerr << "Usage: " << argv[0] << " ctp_config_file" << endl;
 		return -1;
@@ -22,8 +24,6 @@ int main(int argc, char *argv[])
 
 	logger::init(argv[0]);
 	publisher.bind("tcp://*:5556");
-
-	GOOGLE_PROTOBUF_VERIFY_VERSION;
 
 	CMdSpi *cmdspi = new CMdSpi();
 	cmdspi->load_config(d);
