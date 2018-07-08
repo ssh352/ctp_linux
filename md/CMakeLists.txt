@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.4)
 
+add_compile_options(-std=c++11)
 find_library(LIBTHOSTMDUSERAPI_PATH thostmduserapi ../lib)
 # find_library(LIBZMQ_PATH libzmq ../lib)
 # find_library(LIBPROTOBUF_PATH glog ../lib)
@@ -33,5 +34,8 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 # if you want to use link_directories, you should let add_executable after link_directories
 # target_link_libraries(main thostmduserapi})
 target_link_libraries(main ${LIBTHOSTMDUSERAPI_PATH})
+target_link_libraries(main zmq)
+target_link_libraries(main glog)
+target_link_libraries(main protobuf)
 # target_link_libraries(main ${LIBZMQ_PATH})
 # target_link_libraries(main ${LIBPROTOBUF_PATH})
