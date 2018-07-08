@@ -1,4 +1,6 @@
-#include "md_spi.h"
+#include "MdSpi.h"
+#include "zhelpers.hpp"
+#include "ctp.pb.h"
 
 Document d;
 zmq::context_t context (1);

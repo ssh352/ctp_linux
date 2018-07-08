@@ -1,4 +1,6 @@
-#include "md_spi.h"
+#include "MdSpi.h"
+#include "zhelpers.hpp"
+#include "ctp.pb.h"
 
 extern Document d;
 extern zmq::context_t context;
@@ -154,12 +156,12 @@ void CMdSpi::SubscribeMarketData(const vector<string>& instruments, const vector
 	// int iResult = pUserMdApi->SubscribeMarketData(pp, 2);
 	// cerr << "--->>> send SubscribeMarketData request: " << ((iResult == 0) ? "success" : "failed") << endl;
 	//
-	int ncount = instruments.size();
-	char* insts[ncount];
-	for (int i = 0; i < ncount; i++)
-		insts[i] = const_cast<char*>(instruments[i].c_str());
-
-	userapi->SubscribeMarketData(insts, ncount);
+	// int ncount = instruments.size();
+	// char* insts[ncount];
+	// for (int i = 0; i < ncount; i++)
+	//         insts[i] = const_cast<char*>(instruments[i].c_str());
+        //
+	// userapi->SubscribeMarketData(insts, ncount);
 }
 
 void CMdSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificInstrument, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
@@ -247,7 +249,7 @@ void CMdSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField* pDepthMarketDa
 
 bool CMdSpi::IsErrorRspInfo(CThostFtdcRspInfoField* pRspInfo)
 {
-	bool bResult = ((pRspInfo) && (pRspInfo->ErrorID != 0));
+	bool bResult = (pRspInfo && pRspInfo->ErrorID != 0);
 	if (bResult)
 		cerr << "--->>> ErrorID=" << pRspInfo->ErrorID << ", ErrorMsg=" << pRspInfo->ErrorMsg << endl;
 	return bResult;
