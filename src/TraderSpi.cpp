@@ -1,40 +1,39 @@
 // #include "ThostFtdcTraderApi.h"
-#include "../include/TraderSpi.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
-#include <string.h>
-#include <unistd.h>
-#include "rapidjson/document.h"     // rapidjson's DOM-style API
-using namespace std;
-using namespace rapidjson;
+#include "TraderSpi.h"
+#include "zhelpers.hpp"
+// #include <unistd.h>
 
-
-#pragma warning(disable : 4996)
-
-extern CThostFtdcTraderApi* pUserTraderApi;
 extern Document d;
+extern zmq::context_t context;
+extern zmq::socket_t publisher;
 
-extern int iRequestID;
-
-TThostFtdcFrontIDType FRONT_ID;     //前置编号
-TThostFtdcSessionIDType SESSION_ID; //会话编号
-TThostFtdcOrderRefType ORDER_REF;   //报单引用
-
-void CTraderSpi::PrintOut(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
+void CMdSpi::load_config(const Document& d)
 {
-	if (pRspInfo == NULL){
-		cout << "pRspInfo is null!" << endl;
-		return;
-	}
-	printf("ErrorCode=[%d], ErrorMsg=[%s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
-	printf("RequestID=[%d], bIsLast=[%d]\n", nRequestID, bIsLast);
+	broker_id = d["broker_id"].GetString();
+	user_id = d["user_id"].GetString();
+	passwd = d["passwd"].GetString();
+	front_id = d["md_address"].GetString();
 }
 
+void CMdSpi::connect()
+{
+	if (userapi == nullptr) {
+		userapi = CThostFtdcTraderApi::CreateFtdcTraderApi("./log/md/"); // 创建UserApi
+		if (!userapi) {
+			// throw runtime_error("ctp_md failed to create api");
+			throw "CtpTrader failed to create api";
+		}
+		userapi->RegisterSpi(this);
+	}
+
+	userapi->RegisterFront(const_cast<char*>(front_id.c_str())); // connect
+	userapi->Init();
+	userapi->Join();
+	LOG(FATAL) << "CTP exit!";
+}
 void CTraderSpi::OnFrontConnected()
 {
-	cout << "--->>> "
-		<< "OnFrontConnected" << endl;
+	cout << "--->>> " << "OnFrontConnected" << endl;
 	// user login request
 	ReqUserLogin();
 }
@@ -43,24 +42,21 @@ void CTraderSpi::ReqUserLogin()
 {
 	CThostFtdcReqUserLoginField req;
 	memset(&req, 0, sizeof(req));
-	strcpy(req.BrokerID, d["brokerID"].GetString());
-	strcpy(req.UserID, d["userID"].GetString());
-	strcpy(req.Password, d["password"].GetString());
-	int iResult = pUserTraderApi->ReqUserLogin(&req, ++iRequestID);
+	strcpy(req.BrokerID, broker_id.c_str());
+	strcpy(req.UserID, user_id.c_str());
+	strcpy(req.Password, passwd.c_str());
+	int iResult = userapi->ReqUserLogin(&req, ++iRequestID);
 	cout << "--->>> sent login request: " << ((iResult == 0) ? "success" : "failed") << endl;
 }
 
 void CTraderSpi::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
 	cout << "--->>> " << __FUNCTION__ << endl;
-	PrintOut(pRspInfo, nRequestID, bIsLast);
 	// copy from ctp documents demo
 	if (pRspInfo->ErrorID != 0) {
 		return;
 	}
 
-	// printf("TradingDay=%s,LoginTime=%s,BrokerID=%s,UserId=%s,SystemName=%s,FrontID=%d,SessionID=%d\n", pRspUserLogin->TradingDay, pRspUserLogin->LoginTime, pRspUserLogin->BrokerID, pRspUserLogin->UserID, pRspUserLogin->SystemName, pRspUserLogin->FrontID, pRspUserLogin->SessionID);
-	// printf("MaxOrderRef=%s,SHFETime=%s,DCETime=%s,CZCETime=%s,FFEXTime=%s,INETime=%s\n", pRspUserLogin->MaxOrderRef, pRspUserLogin->SHFETime, pRspUserLogin->DCETime, pRspUserLogin->CZCETime, pRspUserLogin->FFEXTime, pRspUserLogin->INETime);
 	if  ( pRspUserLogin== NULL) {
 		cout << "pRspUserLogin is null!" << endl;
 		return;
@@ -104,7 +100,6 @@ void CTraderSpi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField
 {
 	cout << "--->>> "
 		<< "OnRspSettlementInfoConfirm" << endl;
-	PrintOut(pRspInfo, nRequestID, bIsLast);
 	///经纪公司代码
 	if  ( pSettlementInfoConfirm== NULL) {
 		cout << "pSettlementInfoConfirm is null!" << endl;
@@ -135,7 +130,6 @@ void CTraderSpi::ReqQryInstrument()
 void CTraderSpi::OnRspQryInstrument(CThostFtdcInstrumentField* pInstrument, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
 	cout << "--->>> " << "OnRspQryInstrument" << endl;
-	PrintOut(pRspInfo, nRequestID, bIsLast);
 	///合约代码
 	if  ( pInstrument== NULL) {
 		cout << "pInstrument is null!" << endl;
@@ -230,7 +224,6 @@ void CTraderSpi::OnRspQryTradingAccount(CThostFtdcTradingAccountField* pTradingA
 {
 	cout << "--->>> "
 		<< "OnRspQryTradingAccount" << endl;
-	PrintOut(pRspInfo, nRequestID, bIsLast);
 	///经纪公司代码
 	if  ( pTradingAccount== NULL) {
 		cout << "pTradingAccount is null!" << endl;
@@ -352,7 +345,6 @@ void CTraderSpi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* pInve
 {
 	cout << "--->>> "
 		<< "OnRspQryInvestorPosition" << endl;
-	PrintOut(pRspInfo, nRequestID, bIsLast);
 	///合约代码
 	if  (pInvestorPosition == NULL) {
 		cout << "pInvestorPosition  is null!" << endl;
@@ -510,7 +502,6 @@ void CTraderSpi::OnRspOrderInsert(CThostFtdcInputOrderField* pInputOrder, CThost
 {
 	cout << "--->>> "
 		<< "OnRspOrderInsert" << endl;
-	PrintOut(pRspInfo, nRequestID, bIsLast);
 	///经纪公司代码
 	if  (pInputOrder== NULL) {
 		cout << "pInputOrder is null!" << endl;
@@ -611,7 +602,6 @@ void CTraderSpi::OnRspOrderAction(CThostFtdcInputOrderActionField* pInputOrderAc
 {
 	cout << "--->>> "
 		<< "OnRspOrderAction" << endl;
-	PrintOut(pRspInfo, nRequestID, bIsLast);
 	///经纪公司代码
 	if  ( pInputOrderAction== NULL) {
 		cout << "pInputOrderAction is null!" << endl;
@@ -852,26 +842,20 @@ void CTraderSpi::OnRtnTrade(CThostFtdcTradeField* pTrade)
 
 void CTraderSpi::OnFrontDisconnected(int nReason)
 {
-	cout << "--->>> "
-		<< "OnFrontDisconnected" << endl;
-	cout << "--->>> Reason = " << hex << nReason << endl;
+	cout << "--->>> " << "OnFrontDisconnected" << "--->>> Reason = " << hex << nReason << endl;
 }
 
 void CTraderSpi::OnHeartBeatWarning(int nTimeLapse)
 {
-	cout << "--->>> "
-		<< "OnHeartBeatWarning" << endl;
-	cout << "--->>> nTimerLapse = " << nTimeLapse << endl;
+	cout << "--->>> " << "OnHeartBeatWarning" << "--->>> nTimerLapse = " << nTimeLapse << endl;
 }
 
-void CTraderSpi::OnRspError(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
+inline void CTraderSpi::OnRspError(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
-	cout << "--->>> "
-		<< "OnRspError" << endl;
-	PrintOut(pRspInfo, nRequestID, bIsLast);
+	cout << "--->>> ErrorID=" << pRspInfo->ErrorID << ", ErrorMsg=" << pRspInfo->ErrorMsg << endl;
 }
 
-bool CTraderSpi::IsErrorRspInfo(CThostFtdcRspInfoField* pRspInfo)
+inline bool CTraderSpi::IsErrorRspInfo(CThostFtdcRspInfoField* pRspInfo)
 {
 	// 如果ErrorID != 0, 说明收到了错误的响应
 	bool bResult = ((pRspInfo) && (pRspInfo->ErrorID != 0));
@@ -880,12 +864,12 @@ bool CTraderSpi::IsErrorRspInfo(CThostFtdcRspInfoField* pRspInfo)
 	return bResult;
 }
 
-bool CTraderSpi::IsMyOrder(CThostFtdcOrderField* pOrder)
+inline bool CTraderSpi::IsMyOrder(CThostFtdcOrderField* pOrder)
 {
 	return ((pOrder->FrontID == FRONT_ID) && (pOrder->SessionID == SESSION_ID) && (strcmp(pOrder->OrderRef, ORDER_REF) == 0));
 }
 
-bool CTraderSpi::IsTradingOrder(CThostFtdcOrderField* pOrder)
+inline bool CTraderSpi::IsTradingOrder(CThostFtdcOrderField* pOrder)
 {
 	return ((pOrder->OrderStatus != THOST_FTDC_OST_PartTradedNotQueueing) && (pOrder->OrderStatus != THOST_FTDC_OST_Canceled) && (pOrder->OrderStatus != THOST_FTDC_OST_AllTraded));
 }

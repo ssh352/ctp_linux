@@ -1,8 +1,41 @@
 #pragma once
 #include "ThostFtdcTraderApi.h"
+#include "FileUtils.h"
 
 class CTraderSpi : public CThostFtdcTraderSpi
 {
+	private:
+		CThostFtdcTraderApi *userapi;
+		string front_id;
+		string broker_id;
+		string passwd;
+		int reqid;
+public:
+	///用户登录请求
+	void ReqUserLogin();
+	///投资者结算结果确认
+	void ReqSettlementInfoConfirm();
+	///请求查询合约
+	void ReqQryInstrument();
+	///请求查询资金账户
+	void ReqQryTradingAccount();
+	///请求查询投资者持仓
+	void ReqQryInvestorPosition();
+	///报单录入请求
+	void ReqOrderInsert();
+	///报单操作请求
+	void ReqOrderAction(CThostFtdcOrderField *pOrder);
+
+	// 是否收到成功的响应
+	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
+	// 是否我的报单回报
+	bool IsMyOrder(CThostFtdcOrderField *pOrder);
+	// 是否正在交易的报单
+	bool IsTradingOrder(CThostFtdcOrderField *pOrder);
+	// get the config	
+	void load_config(const Document &d);
+	// connect to server
+	virtual void connect();
 public:
 	///当客户端与交易后台建立起通信连接时（还未登录前），该方法被调用。
 	virtual void OnFrontConnected();
@@ -43,28 +76,4 @@ public:
 	///成交通知
 	virtual void OnRtnTrade(CThostFtdcTradeField *pTrade);
 
-private:
-	///用户登录请求
-	void ReqUserLogin();
-	///投资者结算结果确认
-	void ReqSettlementInfoConfirm();
-	///请求查询合约
-	void ReqQryInstrument();
-	///请求查询资金账户
-	void ReqQryTradingAccount();
-	///请求查询投资者持仓
-	void ReqQryInvestorPosition();
-	///报单录入请求
-	void ReqOrderInsert();
-	///报单操作请求
-	void ReqOrderAction(CThostFtdcOrderField *pOrder);
-
-	// 是否收到成功的响应
-	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
-	// 是否我的报单回报
-	bool IsMyOrder(CThostFtdcOrderField *pOrder);
-	// 是否正在交易的报单
-	bool IsTradingOrder(CThostFtdcOrderField *pOrder);
-
-	void PrintOut(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast);
 };

@@ -1,6 +1,8 @@
 #pragma once
-#include "../api/ThostFtdcMdApi.h"
-#include "file_utils.h"
+#include "ThostFtdcMdApi.h"
+#include "FileUtils.h"
+// #include "ctp.pb.h"
+// #include <zmq.hpp>
 
 class CMdSpi : public CThostFtdcMdSpi
 {
@@ -15,9 +17,9 @@ class CMdSpi : public CThostFtdcMdSpi
 	public:
 		void ReqUserLogin();
 		void logout();
+		void SubscribeMarketData();
 		void SubscribeMarketData(const vector<string> &instruments,const vector<string> &markets);
 		bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
-		void PrintOut(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast);
 		CMdSpi();
 		~CMdSpi();
 
